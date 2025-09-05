@@ -96,3 +96,111 @@ BROMEAR, GRITAR, SUSURRAR, ANALIZAR.
 3. Merge conflict: al unir en feature, tendremos hecho un método con el mismo nombre (ejecutarComando), por lo que habrá conflicto.
 
 4. Resolución: dejamos un único switch + un Map<String, Runnable> que asigna los comandos a sus acciones con lambdas.
+
+## Reto 4 - Tesoro de las Llaves Duplicadas
+
+Proyecto Maven en `Taller 1/Reto 4`.
+
+Objetivo: Resolver duplicados de claves provenientes de dos fuentes (HashMap y Hashtable) simulando trabajo paralelo y conflictos de merge.
+
+### Flujo (Simulación Roles)
+
+👉 Estudiante A:
+1. Función `construirHashMap(List<Par>)` que ignora claves duplicadas (conserva el primer valor) usando `HashMap` y `putIfAbsent`.
+2. Documenta ejemplo.
+3. Agrega `clavesMayusculas(Map)` para transformar claves a mayúsculas.
+
+👉 Estudiante B:
+1. Función `construirHashtable(List<Par>)` equivalente pero con `Hashtable` (sincronizada).
+2. Documenta ejemplo.
+3. Agrega `ordenarAsc(Map)` para ordenar por clave (usa `TreeMap`).
+
+👉 Ambos (Conflicto y Unificación):
+1. Crean el mismo método `combinarTesoroFinal(...)` produciendo conflicto de merge.
+2. Resolución final: priorizar valores del `Hashtable` en conflicto de clave.
+3. Aplicar transformaciones: claves mayúsculas + orden ascendente.
+4. Imprimir con `stream()`, `map()`, `sorted()`, `Collectors.toMap()`.
+
+### API Principal
+
+`combinarTesoroFinal(List<Par> entradasHashMap, List<Par> entradasHashtable)` → retorna `Map<String,String>` final (claves mayúsculas, orden ascendente, valores del Hashtable prevalecen).
+
+### Ejemplo
+
+Entradas:
+```
+HashMap (A): [ ("oro","barra"), ("cofre","madera") ]
+Hashtable (B): [ ("cofre","acero"), ("llave","hierro") ]
+```
+Proceso:
+1. HashMap ignora duplicados.
+2. Hashtable ignora duplicados.
+3. Merge prioriza valor de `cofre -> acero`.
+4. Claves a mayúsculas y orden ascendente.
+
+Salida (impresión):
+```
+COFRE=acero
+LLAVE=hierro
+ORO=barra
+```
+
+### Ejecución
+
+Desde la carpeta del reto:
+```
+cd "Taller 1/Reto 4"
+mvn clean test
+```
+Ejecución manual:
+```
+java -cp target/tesoro-llaves-1.0.0-SNAPSHOT.jar com.lab.retos.TesoroLlaves
+```
+
+### Requisitos Cubiertos
+- HashMap y Hashtable.
+- `stream()`, `map()`, `sorted()`, `Collectors.toMap()`.
+- Conflicto simulado (método unificado) con prioridad definida.
+
+## Reto 5 - Batalla de Conjuntos
+
+Proyecto Maven en `Taller 1/Reto 5`.
+
+Objetivo: Dos estudiantes generan conjuntos con reglas distintas y luego se unifican ordenadamente.
+
+👉 Estudiante A:
+1. Método `generarArenaHashSet(int cantidad, int limite, long seed)` → HashSet con aleatorios; elimina múltiplos de 3 vía `stream().filter()`.
+2. Ejemplo: con seed 7, cantidad 12, límite 30 se generan valores (previos) y tras filtrar quedan solo los no múltiplos de 3.
+
+👉 Estudiante B:
+1. Método `generarArenaTreeSet(int cantidad, int limite, long seed)` → TreeSet ordenado; elimina múltiplos de 5.
+2. Ejemplo: con mismos parámetros elimina valores 0,5,10,15,20,25...
+
+👉 Ambos:
+1. Método común `unificar(Set a, Set b)` → TreeSet unión sin duplicados.
+2. Impresión formateada con `imprimir(TreeSet)` usando `stream().map().joining()` en formato: "Número en arena: X".
+3. Conflicto hipotético: firma de `unificar` y formato de impresión; resolución deja versión final mostrada.
+
+### Ejemplo Final
+```
+Set A (sin múltiplos 3):  [2, 4, 7, 8, 11, 14, 17, 19, 20, ...]
+Set B (sin múltiplos 5):  [1, 2, 4, 7, 8, 11, 13, 14, 16, ...]
+Unión ordenada:
+Número en arena: 1
+Número en arena: 2
+Número en arena: 4
+Número en arena: 7
+...
+```
+
+### Ejecución
+```
+cd "Taller 1/Reto 5"
+mvn clean test
+java -cp target/batalla-conjuntos-1.0.0-SNAPSHOT.jar com.lab.retos.BatallaConjuntos
+```
+
+### Requisitos Cubiertos
+- HashSet, TreeSet.
+- `stream().filter()` y expresiones lambda.
+- Ejemplo documentado y JavaDoc en clase.
